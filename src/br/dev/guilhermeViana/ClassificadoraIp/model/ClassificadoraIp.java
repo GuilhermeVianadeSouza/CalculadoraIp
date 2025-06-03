@@ -66,7 +66,7 @@ public class ClassificadoraIp{
 		else if (primeiroOctetoInt >= 240 && primeiroOctetoInt <= 255)
 			ipClasse = "E";
 		else if (primeiroOctetoInt <1 || primeiroOctetoInt > 255)
-			throw new IllegalArgumentException("N�o � possivel encontrar endere�o IP utilizando-se um numero menor que 1 e maior que 255, por favor coloque um numero valido.");
+			throw new IllegalArgumentException("Nao e possivel encontrar endereco IP utilizando-se um numero menor que 1 e maior que 255, por favor coloque um numero valido.");
 		return ipClasse;
 	}
 	

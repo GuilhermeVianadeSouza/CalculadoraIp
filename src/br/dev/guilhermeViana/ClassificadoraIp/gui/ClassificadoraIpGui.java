@@ -13,7 +13,7 @@ import br.dev.guilhermeViana.ClassificadoraIp.model.ClassificadoraIp;
 public class ClassificadoraIpGui {
 
     // Componentes da tela
-    private JLabel labelIP, labelCIDR, labelErro;
+    private JLabel labelIP, labelCIDR, labelErro; 
     private JTextField textOct1, textOct2, textOct3, textOct4, textCIDR;
     private JButton buttonCalcular, buttonApagar;
     private JTextArea areaResultado;
@@ -22,7 +22,7 @@ public class ClassificadoraIpGui {
     public void criarTela() {
         JFrame tela = new JFrame();
         tela.setTitle("Classificadora de IP");
-        tela.setSize(600, 500);
+        tela.setSize(600, 650);
         tela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         tela.setResizable(false);
         tela.setLayout(null);
@@ -33,6 +33,7 @@ public class ClassificadoraIpGui {
         Font fonteTitulo = new Font("Arial", Font.BOLD, 24);
         Font fontePadrao = new Font("Arial", Font.PLAIN, 16);
         Font fonteResultado = new Font("Monospaced", Font.PLAIN, 14);
+        Font fontErro = new Font ("Bold", Font.BOLD, 18);
 
         // Label IP
         labelIP = new JLabel("Endereço IP:");
@@ -83,7 +84,7 @@ public class ClassificadoraIpGui {
         labelErro = new JLabel("Erro: Verifique os campos. Utilize apenas números válidos.");
         labelErro.setForeground(Color.RED);
         labelErro.setBounds(50, 450, 500, 30);
-        labelErro.setFont(fontePadrao);
+        labelErro.setFont(fontErro);
         labelErro.setVisible(false);
 
         // Ações dos botões
@@ -99,8 +100,22 @@ public class ClassificadoraIpGui {
                     String oct3 = textOct3.getText().trim();
                     String oct4 = textOct4.getText().trim();
                     String cidrStr = textCIDR.getText().trim();
-
+                    
                     int cidr = Integer.parseInt(cidrStr);
+                    
+                    if (oct1.equals("00") || oct1.equals("000") ||
+                            oct2.equals("00") || oct2.equals("000") ||
+                            oct3.equals("00") || oct3.equals("000") ||
+                            oct4.equals("00") || oct4.equals("000")) {
+                            throw new IllegalArgumentException("Erro geral");
+                       
+                        }
+                    
+                    if (cidr <= 0 || cidr > 32) {
+                    	throw new IllegalArgumentException("Erro geral");
+                    }
+
+      
 
                     ClassificadoraIp ip = new ClassificadoraIp();
                     ip.setPrimeiroOcteto(oct1);
@@ -127,6 +142,8 @@ public class ClassificadoraIpGui {
 
                 } catch (Exception ex) {
                     areaResultado.setText("");
+                    labelErro.setVisible(true);
+                    labelErro.setText("<html><body style='width: 250px'> Numeracao invalida");
                     labelErro.setVisible(true);
                 }
             }
