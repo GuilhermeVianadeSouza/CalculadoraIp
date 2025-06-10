@@ -97,16 +97,14 @@ public class ClassificadoraIp{
 	this.quartoOcteto = quartoOcteto;
 	}
 	
-	public double getSubClasse() {
+	public int getSubClasse() {
 		if (cidr > 32) {
-			System.out.println("Cidr maior que 32, n�o pode ser utilizado para a realiza��o da conta, por favor insira um numero menor ou igual a 32");
+			return 0;
 		} else if (cidr < 30) {
-			ipsubClasse = Math.pow(2, 32 - cidr) - 2;
+			return (int) (Math.pow(2, 32 - cidr) - 2);
 		} else {
-			ipsubClasse = Math.pow(2, 32 - cidr);
+			return (int) Math.pow(2, 32 - cidr);
 		}
-		
-		return ipsubClasse;
 	}
 	
 	public int getSubRedes() {
@@ -133,21 +131,27 @@ public class ClassificadoraIp{
 
 	
 	//gera mascara binaria
-	private StringBuilder gerarMascaraBin(int cidr) {
-		StringBuilder mascaraBinaria = new StringBuilder();
-		for (int i = 0; i < 32; i++) {
-			mascaraBinaria.append(i < cidr ? '1' : '0');
+	private String gerarMascaraBin(int cidr) {
+	    StringBuilder sb = new StringBuilder();
+	    for (int i = 0; i < 32; i++) {
+	        sb.append(i < cidr ? '1' : '0');
+	    
+	    if ((i + 1) % 8 == 0 && (i + 1) <32) {
+	    	sb.append(".");
+	    }
+	    }
+	    return sb.toString();
 		}
-		
-		return mascaraBinaria;
-	}
 	
-	public String gerarMascaraDecimal (StringBuilder binaria) {
+	
+	public String gerarMascaraDecimal (String mascaraBinariaFormatada) { // Recebe a string já formatada
+		
+		String[] octetosBinarios = mascaraBinariaFormatada.split("\\."); // Divide pela pontuação
 		
 		StringBuilder decimal = new StringBuilder();
 		
 		for (int i = 0; i < 4; i++) {
-			String octeto = binaria.substring(i * 8, (i + 1) * 8);
+			String octeto = octetosBinarios[i]; // Pega cada octeto binário
 			
 			decimal.append(Integer.parseInt(octeto, 2));
 			
@@ -178,77 +182,92 @@ public class ClassificadoraIp{
 	
 	
 	
-	public void calculoDeSubRedes() {
-		
-		if (cidr < 24) {
-			subRede = "Não há cálculo com cidr abaixo de 24";
-		}
-		
-		if (cidr == 24) {
-			subRede = "Não há possibilidades de sub rede";
-		}
-		
-		if (cidr > 24) {
-			int bitsInativos = 32 - cidr;
-			int bitsAtivos = 8 - bitsInativos;
-			
-			int numeroDeRede = (int) Math.pow(2, bitsAtivos);
-			int numeroDeHost = ((int) Math.pow(2, bitsInativos)) - 2;
-			
-			int[] binario = {128, 64, 32, 16, 8, 4, 2, 1};
-			
-			subRede = "Terá " +String.valueOf(numeroDeRede) + " Sub-Redes!";
-			
-			int valorIncrementoHost = 0;
-			String[] octetos = ip.split("\\.");
-			String rede = octetos[0] + "." + octetos[1] + "." + octetos[2] + ".";
-			String intervalo;
-			
-			listaSubRede.clear();
-			
-			for (int i = 1; i <= numeroDeRede; i++) {
-				
-				listaSubRede.add("Sub-rede: " + i);
-				listaSubRede.add("Ip da sub-rede: " + rede + valorIncrementoHost); 
-				valorIncrementoHost++;
-				intervalo = "Intervalo do Host: " + rede + valorIncrementoHost + " - ";
-				valorIncrementoHost += numeroDeHost;
-				intervalo += rede +valorIncrementoHost;
-				listaSubRede.add(intervalo);
-				valorIncrementoHost++;
-				listaSubRede.add("IP de broadcast: " + rede + valorIncrementoHost);
-				listaSubRede.add("------------------------------------------------------------------------------------");
-				valorIncrementoHost++;
-			}
-		}
-	}
+//	public void calculoDeSubRedes() {
+//		
+//		if (cidr < 24) {
+//			subRede = "Não há cálculo com cidr abaixo de 24";
+//		}
+//		
+//		if (cidr == 24) {
+//			subRede = "Não há possibilidades de sub rede";
+//		}
+//		
+//		if (cidr > 24) {
+//			int bitsInativos = 32 - cidr;
+//			int bitsAtivos = 8 - bitsInativos;
+//			
+//			int numeroDeRede = (int) Math.pow(2, bitsAtivos);
+//			int numeroDeHost = ((int) Math.pow(2, bitsInativos)) - 2;
+//			
+//			int[] binario = {128, 64, 32, 16, 8, 4, 2, 1};
+//			
+//			subRede = "Terá " +String.valueOf(numeroDeRede) + " Sub-Redes!";
+//			
+//			int valorIncrementoHost = 0;
+//			String[] octetos = ip.split("\\.");
+//			String rede = octetos[0] + "." + octetos[1] + "." + octetos[2] + ".";
+//			String intervalo;
+//			
+//			listaSubRede.clear();
+//			
+//			for (int i = 1; i <= numeroDeRede; i++) {
+//				
+//				listaSubRede.add("Sub-rede: " + i);
+//				listaSubRede.add("Ip da sub-rede: " + rede + valorIncrementoHost); 
+//				valorIncrementoHost++;
+//				intervalo = "Intervalo do Host: " + rede + valorIncrementoHost + " - ";
+//				valorIncrementoHost += numeroDeHost;
+//				intervalo += rede +valorIncrementoHost;
+//				listaSubRede.add(intervalo);
+//				valorIncrementoHost++;
+//				listaSubRede.add("IP de broadcast: " + rede + valorIncrementoHost);
+//				listaSubRede.add("------------------------------------------------------------------------------------");
+//				valorIncrementoHost++;
+//			}
+//		}
+//	}
 	
 	public List<String> listarSubRedes() {
 	    List<String> lista = new ArrayList<>();
 	    
+	    if (ip == null || ip.isEmpty()) {
+	    	lista.add("Por favor, defina um IP antes de calcular as sub-redes.");
+	    	return lista;
+	    }
+
 	    int ipDecimal = ipParaDecimal(ip);
 	    int quantidadeSubRedes = getSubRedes();
 
 	    if (quantidadeSubRedes == 0) {
-	        lista.add("Não há sub-redes calculáveis para este CIDR.");
+	        lista.add("Não há sub-redes calculáveis para este CIDR ou classe de IP.");
 	        return lista;
 	    }
 
-	    int blocos = (int) Math.pow(2, (32 - cidr)); // Tamanho do bloco
+	    // Tamanho do bloco para cada sub-rede (número de IPs no bloco)
+	    int blocos = (int) Math.pow(2, (32 - cidr)); 
 
 	    for (int i = 0; i < quantidadeSubRedes; i++) {
-	        int inicio = ipDecimal + (i * blocos);
-	        int fim = inicio + blocos - 1;
+	        int inicioSubRedeDecimal = (ipDecimal & (~((1 << (32 - cidr)) - 1))) + (i * blocos);
+	        
+	        String ipRede = decimalParaIp(inicioSubRedeDecimal);
+	        String primeiroValido = decimalParaIp(inicioSubRedeDecimal + 1);
+	        String broadcast = decimalParaIp(inicioSubRedeDecimal + blocos - 1);
+	        String ultimoValido = decimalParaIp(inicioSubRedeDecimal + blocos - 2);
 
-	        String ipRede = decimalParaIp(inicio);
-	        String primeiroValido = decimalParaIp(inicio + 1);
-	        String ultimoValido = decimalParaIp(fim - 1);
-	        String broadcast = decimalParaIp(fim);
 
 	        lista.add("Sub-rede " + (i + 1) + ":");
 	        lista.add("  IP da Sub-rede: " + ipRede);
-	        lista.add("  Primeiro IP válido: " + primeiroValido);
-	        lista.add("  Último IP válido: " + ultimoValido);
+	        
+	        // Verifica se há IPs válidos no host (o que significa que o bloco é maior que 2)
+	        if (blocos > 2) {
+	        	lista.add("  Primeiro IP válido: " + primeiroValido);
+	        	lista.add("  Último IP válido: " + ultimoValido);
+	        } else if (blocos == 2) { // Caso de /31 (2 IPs, rede e broadcast)
+	        	lista.add("  IPs válidos: N/A (bloco /31)");
+	        } else if (blocos == 1) { // Caso de /32 (1 IP, o próprio endereço)
+	        	lista.add("  IPs válidos: N/A (bloco /32)");
+	        }
+
 	        lista.add("  IP de Broadcast: " + broadcast);
 	        lista.add("---------------------------------------------------");
 	    }
@@ -257,12 +276,11 @@ public class ClassificadoraIp{
 	}
 
 
-
 	
 	public void mostrarDados() {
 		
-		mascaraBinaria = gerarMascaraBin(cidr).toString();
-		mascaraDecimal = gerarMascaraDecimal(new StringBuilder(mascaraBinaria));
+		mascaraBinaria = gerarMascaraBin(cidr);
+		mascaraDecimal = gerarMascaraDecimal(mascaraBinaria);
 		ipClasse = getIpClasse();
 	
 		System.out.println("------------------------------------");
@@ -283,4 +301,4 @@ public class ClassificadoraIp{
 
 
 	    
-	    
+	        
